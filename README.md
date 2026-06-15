@@ -35,21 +35,37 @@ python main.py
 启动后访问：
 
 Web 页面：http://127.0.0.1:5000
+
 API 文档：http://127.0.0.1:5000/docs
+
 API 接口
+
 接口	方法	说明
+
 /api/announcements	GET	公告列表（分页、筛选）
+
 /api/announcements/stats	GET	公告统计
+
 /api/companies	GET	公司列表
+
 /api/health	GET	健康检查
+
 /api/announcements 参数
+
 参数	类型	默认值	说明
+
 page	int	1	页码
+
 page_size	int	20	每页条数（最大100）
+
 date_from	string	-	起始日期 YYYY-MM-DD
+
 date_to	string	-	截止日期 YYYY-MM-DD
+
 keyword	string	-	标题关键词搜索
+
 stock_code	string	06666	股票代码筛选
+
 示例
 # 查询 06666 的公告
 curl "http://127.0.0.1:5000/api/announcements?stock_code=06666"
