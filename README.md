@@ -1,0 +1,2 @@
+# hkstock
+announcements auto refresh
