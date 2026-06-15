@@ -83,17 +83,23 @@ webhook_url: "https://your-webhook.example.com/hook"
 项目结构
 hkstock/
 ├── main.py                    # 主程序（邮件采集 + FastAPI 服务）
+
 ├── mail_config.yaml           # 邮箱和 Webhook 配置
+
 ├── hkex_announcements.csv     # 公告数据持久化文件
+
 ├── requirements.txt           # Python 依赖
+
 ├── templates/
+
 │   └── index.html             # Web 查询页面
+
 └── README.md
-技术栈
-Python 3.10+
-FastAPI — Web 框架
-uvicorn — ASGI 服务器
-imap_tools — IMAP 邮箱客户端
-BeautifulSoup — HTML 解析
-schedule — 定时任务
-PyYAML — 配置管理
+# 技术栈
+## Python 3.10+
+## FastAPI — Web 框架
+## uvicorn — ASGI 服务器
+## imap_tools — IMAP 邮箱客户端
+## BeautifulSoup — HTML 解析
+## schedule — 定时任务
+## PyYAML — 配置管理
