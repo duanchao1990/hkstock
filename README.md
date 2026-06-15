@@ -23,8 +23,11 @@ pip install -r requirements.txt
 
 email:
   server: "imap.qq.com"         # IMAP 服务器地址
+  
   username: "your@email.com"    # 邮箱地址
+  
   password: "your_password"     # 密码或授权码
+  
 QQ邮箱需使用授权码，在邮箱设置 → 账户 → POP3/IMAP 服务中生成。
 
 3. 启动服务
