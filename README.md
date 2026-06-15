@@ -84,6 +84,7 @@ webhook_url: "https://your-webhook.example.com/hook"
 # hkstock/
 ## ├── main.py                    # 主程序（邮件采集 + FastAPI 服务）
 ## ├── mail_config.yaml           # 邮箱和 Webhook 配置
+## ├── annoucement_history.py     # 历史公告数据批量下载
 ## ├── hkex_announcements.csv     # 公告数据持久化文件
 ## ├── requirements.txt           # Python 依赖
 ## ├── templates/
