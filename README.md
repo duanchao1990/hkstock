@@ -8,13 +8,13 @@
 本方案为免费方案，方便快捷仅须初始化下载存量数据，及每180天更新邮箱授权码即可实现相同功能
 
 # 功能特性
-## 邮件自动采集 — 定时（默认15分钟）检查 IMAP 邮箱，解析港交所公告邮件
-## 智能解析 — 从邮件中提取日期、标题、链接、公司名称、股票代码
-## 本地持久化 — 公告数据存储为 CSV 文件，支持增量更新和去重
-## Web 查询界面 — 支持按年份、关键词、股票代码筛选公告
-## REST API — 提供公告查询、统计、公司列表等接口
-## Webhook 推送 — 新公告可通过 Webhook 推送到外部系统
-## OpenAPI 文档 — 自动生成 Swagger 文档（/docs）
+ 邮件自动采集 — 定时（默认15分钟）检查 IMAP 邮箱，解析港交所公告邮件
+ 智能解析 — 从邮件中提取日期、标题、链接、公司名称、股票代码
+ 本地持久化 — 公告数据存储为 CSV 文件，支持增量更新和去重
+ Web 查询界面 — 支持按年份、关键词、股票代码筛选公告
+ REST API — 提供公告查询、统计、公司列表等接口
+ Webhook 推送 — 新公告可通过 Webhook 推送到外部系统
+ OpenAPI 文档 — 自动生成 Swagger 文档（/docs）
 快速开始
 1. 安装依赖
 pip install -r requirements.txt
@@ -96,15 +96,22 @@ webhook_url: "https://your-webhook.example.com/hook"
   "timestamp": "2026-06-12T19:00:00"
 }
 数据存储
+
 公告数据保存在 hkex_announcements.csv，字段如下：
 
 字段	说明
+
 日期	YYYY-MM-DD 格式
+
 标题	公告标题
+
 链接	港交所公告 PDF/XLSX 链接
+
 公司名称	上市公司名称
+
 股票代码	5位港股代码
-项目结构
+
+# 项目结构
 # hkstock/
 ## ├── main.py                    # 主程序（邮件采集 + FastAPI 服务）
 ## ├── mail_config.yaml           # 邮箱和 Webhook 配置
@@ -115,10 +122,16 @@ webhook_url: "https://your-webhook.example.com/hook"
 ## │   └── index.html             # Web 查询页面
 ## └── README.md
 # 技术栈
-## Python 3.10+
-## FastAPI — Web 框架
-## uvicorn — ASGI 服务器
-## imap_tools — IMAP 邮箱客户端
-## BeautifulSoup — HTML 解析
-## schedule — 定时任务
-## PyYAML — 配置管理
+Python 3.10+
+
+FastAPI — Web 框架
+
+uvicorn — ASGI 服务器
+
+imap_tools — IMAP 邮箱客户端
+
+BeautifulSoup — HTML 解析
+
+schedule — 定时任务
+
+PyYAML — 配置管理
