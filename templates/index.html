@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公告、通告及通函 - 港股公告监控</title>
+    <style>
+        :root {
+            --primary: #c0392b;
+            --primary-light: #e74c3c;
+            --gold: #d4a017;
+            --gold-light: #f0d890;
+            --bg: #faf8f3;
+            --card-bg: #ffffff;
+            --border: #e8e2d6;
+            --text: #333333;
+            --text-light: #888888;
+            --date-color: #c9a227;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ── 导航条 ─────────────────────────────── */
+        .top-nav {
+            background: #fffef5;
+            border-bottom: 3px solid var(--primary);
+            padding: 12px 24px;
+            font-size: 13px;
+            color: #999;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .top-nav a {
+            text-decoration: none;
+            color: #666;
+            transition: color 0.2s;
+        }
+        .top-nav a:hover { color: var(--primary); }
+        .top-nav a.active { color: var(--primary); font-weight: 600; }
+
+        /* ── 头部区域 ───────────────────────────── */
+        .header-section {
+            max-width: 1100px;
+            margin: 40px auto 30px;
+            padding: 0 20px;
+        }
+        .header-title {
+            color: var(--primary);
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+        .header-subtitle {
+            color: var(--gold);
+            font-size: 18px;
+            letter-spacing: 4px;
+            margin-top: 4px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* ── 工具栏 ─────────────────────────────── */
+        .toolbar {
+            max-width: 1100px;
+            margin: 0 auto 24px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .year-tabs {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .year-tab {
+            padding: 6px 18px;
+            border: 1px solid var(--border);
+            background: #fdfbf3;
+            cursor: pointer;
+            font-size: 14px;
+            color: #777;
+            border-radius: 3px;
+            transition: all 0.15s;
+        }
+        .year-tab:hover { border-color: var(--gold-light); color: var(--gold); }
+        .year-tab.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            font-weight: 600;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+            max-width: 320px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 8px 36px 8px 14px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            background: #fff;
+            transition: border-color 0.2s;
+        }
+        .search-box input:focus { border-color: var(--gold-light); }
+        .search-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bbb;
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        .auto-refresh {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #999;
+        }
+        .auto-refresh select {
+            padding: 5px 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 13px;
+            outline: none;
+            background: #fff;
+        }
+
+        /* ── 统计信息 ───────────────────────────── */
+        .stats-bar {
+            max-width: 1100px;
+            margin: 0 auto 16px;
+            padding: 0 20px;
+            font-size: 13px;
+            color: #aaa;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .stats-bar .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #27ae60;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.35; }
+        }
+
+        /* ── 公告列表 ───────────────────────────── */
+        .announcement-list {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+        }
+        .ann-item {
+            display: flex;
+            align-items: flex-start;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 18px 22px;
+            margin-bottom: 10px;
+            transition: box-shadow 0.15s, border-color 0.15s;
+            gap: 20px;
+        }
+        .ann-item:hover {
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            border-color: var(--gold-light);
+        }
+        .ann-date {
+            flex-shrink: 0;
+            width: 100px;
+            color: var(--date-color);
+            font-size: 16px;
+            font-weight: 600;
+            padding-top: 2px;
+            letter-spacing: 0.5px;
+            font-family: "Courier New", monospace;
+        }
+        .ann-meta {
+            flex-shrink: 0;
+            width: 140px;
+            padding-top: 2px;
+        }
+        .ann-company {
+            font-size: 14px;
+            color: #555;
+            font-weight: 600;
+        }
+        .ann-code {
+            font-size: 12px;
+            color: var(--primary);
+            background: #fff0f0;
+            padding: 1px 8px;
+            border-radius: 3px;
+            display: inline-block;
+            margin-top: 2px;
+            font-family: "Courier New", monospace;
+        }
+        .ann-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .ann-title {
+            font-size: 15px;
+            color: #444;
+            line-height: 1.55;
+            word-break: break-word;
+        }
+        .ann-link {
+            display: inline-flex;
+            align-items: center;
+            color: inherit;
+            text-decoration: none;
+            width: 100%;
+        }
+        .ann-link:hover .ann-title {
+            color: var(--primary-light);
+            text-decoration: underline;
+        }
+        .pdf-icon {
+            flex-shrink: 0;
+            width: 28px;
+            height: 32px;
+            margin-left: 12px;
+        }
+        .pdf-icon svg {
+            width: 100%; height: 100%;
+            fill: #ccc;
+            transition: fill 0.15s;
+        }
+        .ann-link:hover .pdf-icon svg { fill: var(--primary-light); }
+
+        /* ── 加载 / 空状态 ─────────────────────── */
+        .loading {
+            text-align: center;
+            padding: 80px 20px;
+            color: #bbb;
+            font-size: 15px;
+        }
+        .spinner {
+            width: 36px; height: 36px;
+            border: 3px solid #eee;
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #ccc;
+        }
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        /* ── 分页 ───────────────────────────────── */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            margin-top: 30px;
+            padding-top: 20px;
+        }
+        .page-btn {
+            padding: 7px 14px;
+            border: 1px solid var(--border);
+            background: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            border-radius: 3px;
+            transition: all 0.15s;
+        }
+        .page-btn:hover:not(:disabled) {
+            border-color: var(--gold-light);
+            color: var(--gold);
+        }
+        .page-btn.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+        .page-btn:disabled {
+            opacity: 0.4; cursor: not-allowed;
+        }
+        .page-info {
+            font-size: 13px; color: #aaa; margin: 0 10px;
+        }
+
+        /* ── 查看更多按钮 ─────────────────────── */
+        .view-more-wrap {
+            text-align: right;
+            margin-bottom: 20px;
+            padding-right: 20px;
+            max-width: 1100px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .view-more {
+            font-size: 14px;
+            color: #888;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .view-more:hover { color: var(--primary); }
+
+        /* ── 响应式 ────────────────────────────── */
+        @media (max-width: 640px) {
+            .header-title { font-size: 22px; }
+            .header-subtitle { font-size: 14px; }
+            .ann-date { width: 78px; font-size: 13px; }
+            .ann-meta { width: 100px; }
+            .ann-item { padding: 14px 16px; gap: 12px; }
+            .ann-title { font-size: 14px; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .search-box { max-width: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 导航条 -->
+    <nav class="top-nav">
+        <a href="#">投资者关系</a>
+        <span>&rsaquo;</span>
+        <a href="#" class="active">公告、通告及通函</a>
+    </nav>
+
+    <!-- 头部 -->
+    <section class="header-section">
+        <h1 class="header-title">公告、通告及通函</h1>
+        <p class="header-subtitle">Announcements &amp; Circulars &amp; Notices</p>
+    </section>
+
+    <!-- 工具栏 -->
+    <div class="toolbar">
+        <div class="year-tabs" id="yearTabs"></div>
+        <div class="code-filter">
+            <label style="font-size:13px;color:#888;">股票代码</label>
+            <select id="codeSelect"
+                    style="width:180px;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:14px;outline:none;background:#fff;"
+                    onchange="onCodeChange(this.value)">
+                <!-- JS 动态填充 -->
+            </select>
+        </div>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="搜索公告标题..." />
+            <span class="search-icon">&#128269;</span>
+        </div>
+        <label class="auto-refresh">
+            自动刷新:
+            <select id="refreshSelect" onchange="setAutoRefresh(this.value)">
+                <option value="">关闭</option>
+                <option value="30000">30秒</option>
+                <option value="60000" selected>1分钟</option>
+                <option value="300000">5分钟</option>
+                <option value="600000">10分钟</option>
+            </select>
+        </label>
+    </div>
+
+    <!-- 统计 -->
+    <div class="stats-bar">
+        <span class="dot"></span>
+        <span id="statsText">加载中...</span>
+        <span style="margin-left:auto;font-size:12px;" id="lastUpdateText"></span>
+    </div>
+
+    <!-- 公告列表 -->
+    <div class="announcement-list" id="announcementList">
+        <div class="loading">
+            <div class="spinner"></div>
+            正在加载公告数据...
+        </div>
+    </div>
+
+    <script>
+    // ════════════════════════════════════════
+    // 状态
+    // ════════════════════════════════════════
+    const API_BASE = window.location.port ? '' : 'http://127.0.0.1:5000';
+    let currentPage = 1;
+    const PAGE_SIZE = 20;
+    let selectedYear = new Date().getFullYear().toString();
+    let searchKeyword = '';
+    let stockCode = '06666';
+    let totalRecords = 0;
+    let refreshTimer = null;
+
+    // PDF 图标 SVG（内联）
+    const PDF_ICON_SVG = `
+        <svg viewBox="0 0 38 48" xmlns="http://www.w3.org/2000/svg">
+            <path d="M24 0H4C1.8 0 0 1.8 0 4v40c0 2.2 1.8 4 4 4h30c2.2 0 4-1.8 4-4V12L24 0z"/>
+            <path fill="#fff" d="M26 12V1l11 11H26z"/>
+            <text x="19" y="34" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">PDF</text>
+        </svg>`;
+
+    // ════════════════════════════════════════
+    // 初始化
+    // ════════════════════════════════════════
+    document.addEventListener('DOMContentLoaded', function() {
+        initYearTabs();
+        loadCompanies();
+        bindSearch();
+        fetchAnnouncements();
+    });
+
+    function initYearTabs() {
+        const container = document.getElementById('yearTabs');
+        const currentYear = new Date().getFullYear();
+        for (let y = currentYear; y >= 2020; y--) {
+            const btn = document.createElement('button');
+            btn.className = 'year-tab' + (y === currentYear ? ' active' : '');
+            btn.textContent = y.toString();
+            btn.dataset.year = y.toString();
+            btn.onclick = function() { selectYear(y.toString()); };
+            container.appendChild(btn);
+        }
+    }
+
+    function loadCompanies() {
+        fetch(API_BASE + '/api/companies')
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.code === 0 && data.data) {
+                    const select = document.getElementById('codeSelect');
+                    select.innerHTML = '';
+                    data.data.forEach(function(company) {
+                        const option = document.createElement('option');
+                        option.value = company.stock_code;
+                        option.textContent = company.stock_code + ' - ' + (company.company_name || '未知公司');
+                        // 选中当前 stockCode
+                        if (company.stock_code === stockCode) {
+                            option.selected = true;
+                        }
+                        select.appendChild(option);
+                    });
+                }
+            })
+            .catch(function(e) { console.warn('获取公司列表失败:', e); });
+    }
+
+    function selectYear(year) {
+        selectedYear = year;
+        currentPage = 1;
+        document.querySelectorAll('.year-tab').forEach(function(el) {
+            el.classList.toggle('active', el.dataset.year === year);
+        });
+        fetchAnnouncements();
+    }
+
+    function onCodeChange(code) {
+        stockCode = code.trim() || '06666';
+        currentPage = 1;
+        fetchAnnouncements();
+    }
+
+    function bindSearch() {
+        const input = document.getElementById('searchInput');
+        let timer = null;
+        input.addEventListener('input', function() {
+            clearTimeout(timer);
+            timer = setTimeout(function() {
+                searchKeyword = this.value.trim();
+                currentPage = 1;
+                fetchAnnouncements();
+            }.bind(this), 400);
+        });
+    }
+
+    function setAutoRefresh(ms) {
+        if (refreshTimer) clearInterval(refreshTimer);
+        if (ms) {
+            refreshTimer = setInterval(fetchAnnouncements, parseInt(ms));
+        }
+    }
+
+    // ════════════════════════════════════════
+    // 数据获取与渲染
+    // ════════════════════════════════════════
+    function fetchAnnouncements() {
+        const listEl = document.getElementById('announcementList');
+        listEl.innerHTML = '<div class="loading"><div class="spinner"></div>正在加载公告数据...</div>';
+
+        let url = API_BASE + '/api/announcements?page=' + currentPage + '&page_size=' + PAGE_SIZE;
+
+        // 股票代码（始终传入，后端默认 06666）
+        url += '&stock_code=' + encodeURIComponent(stockCode);
+
+        if (selectedYear) {
+            url += '&date_from=' + selectedYear + '-01-01&date_to=' + selectedYear + '-12-31';
+        }
+        if (searchKeyword) {
+            url += '&keyword=' + encodeURIComponent(searchKeyword);
+        }
+
+        fetch(url)
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                renderList(data);
+                fetchStats();
+            })
+            .catch(function(err) {
+                console.error('获取公告失败:', err);
+                listEl.innerHTML =
+                    '<div class="empty-state"><div class="icon">&#9888;</div><p>无法连接到服务器，请确认 API 服务已启动</p></div>';
+            });
+
+        // 更新时间戳
+        document.getElementById('lastUpdateText').textContent =
+            '最后更新: ' + new Date().toLocaleString('zh-CN');
+    }
+
+    function fetchStats() {
+        fetch(API_BASE + '/api/announcements/stats?stock_code=' + encodeURIComponent(stockCode))
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.code === 0 && data.data) {
+                    const d = data.data;
+                    const yearCount = d.by_date[selectedYear] || 0;
+                    document.getElementById('statsText').textContent =
+                        '共 ' + d.total + ' 条公告 | 当前筛选: ' + totalRecords + ' 条';
+                }
+            })
+            .catch(function(e) { console.warn('统计获取失败:', e); });
+    }
+
+    function renderList(data) {
+        const listEl = document.getElementById('announcementList');
+
+        if (!data || data.code !== 0 || !data.data) {
+            listEl.innerHTML = '<div class="empty-state"><p>暂无公告数据</p></div>';
+            return;
+        }
+
+        const result = data.data;
+        totalRecords = result.total;
+        const items = result.items || [];
+
+        if (items.length === 0) {
+            listEl.innerHTML = '<div class="empty-state"><div class="icon">&#128196;</div><p>没有找到匹配的公告</p></div>';
+            renderPagination(result.total);
+            return;
+        }
+
+        let html = '';
+        items.forEach(function(item) {
+            const title = escapeHtml(item.title || '');
+            const link = item.link || '';
+            const dateStr = item.date || '';
+            const company = item.company_name || '';
+            const code = item.stock_code || '';
+
+            html +=
+                '<div class="ann-item">' +
+                    '<div class="ann-date">' + dateStr + '</div>' +
+                    (company || code ? (
+                        '<div class="ann-meta">' +
+                            (company ? '<div class="ann-company">' + escapeHtml(company) + '</div>' : '') +
+                            (code ? '<span class="ann-code">' + escapeHtml(code) + '</span>' : '') +
+                        '</div>'
+                    ) : '') +
+                    '<div class="ann-content">' +
+                        '<a class="ann-link" href="' + escapeHtml(link) + '" target="_blank" rel="noopener">' +
+                            '<span class="ann-title">' + title + '</span>' +
+                            '<span class="pdf-icon">' + PDF_ICON_SVG + '</span>' +
+                        '</a>' +
+                    '</div>' +
+                '</div>';
+        });
+
+        html += renderPaginationHtml(result.total);
+
+        listEl.innerHTML = html;
+    }
+
+    function renderPagination(total) {
+        const pageEl = document.querySelector('.pagination');
+        if (pageEl) {
+            pageEl.outerHTML = renderPaginationHtml(total).replace('<div ', '<div class="pagination" ');
+        }
+    }
+
+    function renderPaginationHtml(total) {
+        const totalPages = Math.ceil(total / PAGE_SIZE);
+        if (totalPages <= 1) return '';
+
+        let html = '<div class="pagination">';
+        html += '<button class="page-btn" onclick="goPage(' + (currentPage - 1) + ')"' +
+                (currentPage <= 1 ? ' disabled' : '') + '>&laquo; 上一页</button>';
+
+        const startPage = Math.max(1, currentPage - 2);
+        const endPage = Math.min(totalPages, currentPage + 2);
+
+        for (let i = startPage; i <= endPage; i++) {
+            html += '<button class="page-btn' + (i === currentPage ? ' active' : '') +
+                    '" onclick="goPage(' + i + ')">' + i + '</button>';
+        }
+
+        html += '<button class="page-btn" onclick="goPage(' + (currentPage + 1) + ')"' +
+                (currentPage >= totalPages ? ' disabled' : '') + '>下一页 &raquo;</button>';
+        html += '<span class="page-info">' + currentPage + ' / ' + totalPages + ' 页，共 ' + total + ' 条</span>';
+        html += '</div>';
+
+        return html;
+    }
+
+    function goPage(page) {
+        const totalPages = Math.ceil(totalRecords / PAGE_SIZE);
+        if (page < 1 || page > totalPages) return;
+        currentPage = page;
+        fetchAnnouncements();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ════════════════════════════════════════
+    // 工具函数
+    // ════════════════════════════════════════
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+    </script>
+
+</body>
+</html>
