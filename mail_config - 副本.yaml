@@ -1,0 +1,4 @@
+email:
+  server: "imap.qq.com"   # 邮箱的 IMAP 服务器地址，如 imap.gmail.com 或 imap.qq.com
+  username: "test@qq.com"   # 你的邮箱地址
+  password: ""      # 你的邮箱密码或授权码
